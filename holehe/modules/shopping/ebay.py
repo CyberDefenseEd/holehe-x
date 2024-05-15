@@ -1,12 +1,11 @@
 from holehe.core import *
 from holehe.localuseragent import *
 
-
 async def ebay(email, client, out):
-    name = "ebay"
-    domain = "ebay.com"
-    method = "login"
-    frequent_rate_limit=True
+    name        = "ebay"
+    domain      = "ebay.com"
+    method      = "login"
+    frequent_rate_limit = True
 
     headers = {
         'User-Agent': random.choice(ua["browsers"]["chrome"]),
@@ -38,7 +37,7 @@ async def ebay(email, client, out):
         'https://signin.ebay.com/signin/srv/identifer',
         data=data, headers=headers)
     results = json.loads(req.text)
-    if "err" in results.keys():
+    if "errorMsg" in results.keys():
         out.append({"name": name,"domain":domain,"method":method,"frequent_rate_limit":frequent_rate_limit,
                     "rateLimit": False,
                     "exists": False,
