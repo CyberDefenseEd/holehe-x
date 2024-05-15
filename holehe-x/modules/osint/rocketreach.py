@@ -1,0 +1,68 @@
+# Holehe-X Module #
+from localuseragent import useragents
+from random import choice
+
+
+async def rocketreach(email, client, out):
+    name = "rocketreach"
+    domain = "rocketreach.co"
+    method= "register"
+    rate_limit=False
+
+    headers = {
+        'User-Agent': choice(useragents["browsers"]["firefox"]),
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'en,en-US;q=0.5',
+        'Referer': 'https://rocketreach.co/signup',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'TE': 'Trailers',
+    }
+
+    try:
+        response = await client.get("https://rocketreach.co/signup")
+
+        token =  re.search(r'name="csrfmiddlewaretoken" value="(.*)"', response.text).group(1)
+        headers["x-csrftoken"] = token
+
+    
+    except Exception:
+        out.append({"name": name,"domain":domain,"method":method,"rate_limit":rate_limit,
+                    "rateLimit": True,
+                    "exists": False,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
+        return()
+
+    try:
+        r = await client.get('https://rocketreach.co/v1/validateEmail?email_address='+email, headers=headers)
+    except Exception:
+        out.append({"name": name,"domain":domain,"method":method,"rate_limit":rate_limit,
+                    "rateLimit": True,
+                    "exists": False,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
+        return()
+    if r.json()["found"]==True:
+        out.append({"name": name,"domain":domain,"method":method,"rate_limit":rate_limit,
+                    "rateLimit": False,
+                    "exists": True,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
+    elif r.json()["found"]==False:
+        out.append({"name": name,"domain":domain,"method":method,"rate_limit":rate_limit,
+                    "rateLimit": False,
+                    "exists": False,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
+    else:
+        out.append({"name": name,"domain":domain,"method":method,"rate_limit":rate_limit,
+                    "rateLimit": True,
+                    "exists": False,
+                    "emailrecovery": None,
+                    "phoneNumber": None,
+                    "others": None})
